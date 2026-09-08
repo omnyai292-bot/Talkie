@@ -19,8 +19,28 @@
     .sent { background-color: #f48fb1; color: #121212; align-self: flex-end; border-bottom-left-radius: 4px; font-weight: 500; }
     .user-name { font-size: 11px; font-weight: bold; margin-bottom: 4px; display: block; opacity: 0.8; }
     
-    /* كارت الفاتورة داخل الشات */
-    .bill-card { background-color: #1e1e1e; border: 1px solid #f48fb1; border-radius: 16px; padding: 14px; margin: 6px 0; width: 100%; max-width: 280px; align-self: flex-end; }
+    /* زر فتح الميزة الذكية */
+    .feature-trigger-btn {
+      background: #1e1e1e;
+      border: 1px solid #f48fb1;
+      color: #f48fb1;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      transition: all 0.2s ease;
+    }
+    .feature-trigger-btn:hover { background: #f48fb1; color: #121212; }
+
+    /* كارت الفاتورة الذكية الأسود */
+    .bill-card { background-color: #1e1e1e; border: 1px solid #f48fb1; border-radius: 16px; padding: 14px; margin: 6px 0; width: 100%; max-width: 280px; align-self: center; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
     .bill-title { color: #f48fb1; font-weight: bold; margin-bottom: 10px; font-size: 14px; text-align: center; }
     .input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
     .input-group input { padding: 8px; border-radius: 8px; border: 1px solid #333; background: #121212; color: #fff; text-align: center; font-size: 13px; }
@@ -52,17 +72,16 @@
   <div class="chat-container" id="chat">
     <div class="message received">
       <span class="user-name">أحمد</span>
-      عامل إيه يا صاحبي؟ جاهز لخروجة بكرة ولا عندك مذاكرة؟ ☕
+      يا سارة، العشا النهاردة كان تحفة! الحساب كلفنا 750 جنيه كلنا. 🍕 Hamburger
     </div>
 
     <div class="message sent">
-      <span class="user-name">أنت</span>
-      الحمد لله تمام! جاهز جداً، هننزل فين؟
-    </div>
-
-    <div class="message received">
-      <span class="user-name">أحمد</span>
-      هنتقابل في المطعم، ولما نخلص الحساب هنستخدم أداة الفاتورة 💳 تقسمه بيننا!
+      <span class="user-name">سارة</span>
+      تمام جداً! احنا كنا 3 أفراد.. ادوسي على البطاقة دي ونقسمها بالحاسبة الذكية 👇
+      <br>
+      <button class="feature-trigger-btn" id="triggerBtn" onclick="openBillCard()">
+        💳 فتح حاسبة الفاتورة الذكية
+      </button>
     </div>
   </div>
 
@@ -82,7 +101,6 @@
   </div>
 
   <script>
-    // تنظيف أي رسائل قديمة مخزنة تجنباً لظهور الشات القديم
     localStorage.removeItem('talkie_messages');
 
     let qrGenerated = false;
@@ -136,26 +154,18 @@
       chat.scrollTop = chat.scrollHeight;
     }
 
-    function sendMessage() {
-      const input = document.getElementById('messageInput');
-      const text = input.value.trim();
-      if (text !== '') {
-        appendMessageElement(text, 'sent', 'أنت');
-        input.value = '';
-
-        setTimeout(() => {
-          let botReply = "تمام يا بوب، ظبط الكلام ونتقابل 👍";
-          if (text.includes("سلام") || text.includes("مرحبا") || text.includes("ازيك")) {
-            botReply = "حبيبي يا غالي، نورت الشات ✨";
-          } else if (text.includes("كام") || text.includes("حساب") || text.includes("فلوس")) {
-            botReply = "دوس على زرار الفاتورة 💳 تحت واحسب نصيب كل واحد كام!";
-          }
-          appendMessageElement(botReply, 'received', 'أحمد');
-        }, 1000);
+    // فتح البطاقة السوداء عند الضغط على الزرار داخل المحادثة
+    function openBillCard() {
+      const triggerBtn = document.getElementById('triggerBtn');
+      if (triggerBtn) {
+        triggerBtn.disabled = true;
+        triggerBtn.style.opacity = '0.5';
+        triggerBtn.textContent = '✔️ تم فتح الحاسبة';
       }
+      sendBillCard(750, 3);
     }
 
-    function sendBillCard() {
+    function sendBillCard(defaultAmount = '', defaultPeople = '') {
       const chat = document.getElementById('chat');
       const cardId = 'bill_' + Date.now();
       
@@ -163,8 +173,8 @@
         <div class="bill-card">
           <div class="bill-title">💳 تقسيم الفاتورة الذكي</div>
           <div class="input-group">
-            <input type="number" id="amount_${cardId}" placeholder="المبلغ الإجمالي (ج.م)">
-            <input type="number" id="people_${cardId}" placeholder="عدد الأشخاص">
+            <input type="number" id="amount_${cardId}" placeholder="المبلغ الإجمالي (ج.م)" value="${defaultAmount}">
+            <input type="number" id="people_${cardId}" placeholder="عدد الأشخاص" value="${defaultPeople}">
           </div>
           <button class="bill-btn" onclick="calculateDynamicBill('${cardId}')">احسب نصيب كل فرد</button>
           <div class="bill-result" id="result_${cardId}"></div>
@@ -185,10 +195,29 @@
         resultDiv.textContent = `نصيب الفرد: ${perPerson} ج.م`;
 
         setTimeout(() => {
-          appendMessageElement(`تمام يا سيدي، كدة كل واحد يدفع ${perPerson} جنيه 👌`, 'received', 'أحمد');
+          appendMessageElement(`تمام كده، نصيب كل واحد فينا ${perPerson} ج.م 👍`, 'received', 'أحمد');
         }, 800);
       } else {
         resultDiv.textContent = 'أدخل أرقاماً صحيحة';
+      }
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const text = input.value.trim();
+      if (text !== '') {
+        appendMessageElement(text, 'sent', 'أنت');
+        input.value = '';
+
+        setTimeout(() => {
+          let botReply = "تمام استلمت رسالتك! 👍";
+          if (text.includes("سلام") || text.includes("مرحبا") || text.includes("ازيك")) {
+            botReply = "أهلاً بيك! نورت الشات ✨";
+          } else if (text.includes("حساب") || text.includes("فاتورة")) {
+            botReply = "تقدر تضغط على زرار الفاتورة 💳 تحت عشان تفتح الحسبة!";
+          }
+          appendMessageElement(botReply, 'received', 'أحمد');
+        }, 1000);
       }
     }
 
@@ -222,5 +251,5 @@
   </script>
 
 </body>
-</html>
-
+  </html>
+  
