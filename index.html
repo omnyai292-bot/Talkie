@@ -8,33 +8,37 @@
   <title>Talkie</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background-color: #121212; color: #ffffff; display: flex; flex-direction: column; height: 100vh; }
     .header { background-color: #1e1e1e; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
-    .header h1 { color: #f48fb1; font-size: 22px; }
-    .qr-btn { background-color: #262626; color: #f48fb1; border: 1px solid #f48fb1; padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: bold; }
-    .chat-container { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-    .message { max-width: 80%; padding: 12px 16px; border-radius: 16px; font-size: 15px; word-wrap: break-word; }
+    .header h1 { color: #f48fb1; font-size: 20px; }
+    .qr-btn { background-color: #262626; color: #f48fb1; border: 1px solid #f48fb1; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; font-weight: bold; }
+    .chat-container { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .message { max-width: 80%; padding: 10px 14px; border-radius: 16px; font-size: 14px; word-wrap: break-word; line-height: 1.4; }
     .received { background-color: #262626; align-self: flex-start; border-bottom-right-radius: 4px; color: #fff; }
     .sent { background-color: #f48fb1; color: #121212; align-self: flex-end; border-bottom-left-radius: 4px; font-weight: 500; }
     .user-name { font-size: 11px; font-weight: bold; margin-bottom: 4px; display: block; opacity: 0.8; }
-    .bill-card { background-color: #1e1e1e; border: 1px solid #f48fb1; border-radius: 16px; padding: 16px; margin: 8px 0; width: 100%; max-width: 320px; align-self: center; }
-    .bill-title { color: #f48fb1; font-weight: bold; margin-bottom: 12px; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
-    .input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
-    .input-group input { padding: 10px; border-radius: 8px; border: 1px solid #333; background: #121212; color: #fff; text-align: center; }
-    .bill-btn { background-color: #f48fb1; color: #121212; border: none; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; }
-    .bill-result { margin-top: 10px; font-weight: bold; text-align: center; color: #f48fb1; }
-    .input-area { background-color: #1e1e1e; padding: 12px; display: flex; gap: 8px; border-top: 1px solid #222; align-items: center; }
-    .input-area input { flex: 1; padding: 12px; border-radius: 20px; border: 1px solid #333; background: #121212; color: white; outline: none; }
-    .send-btn, .mic-btn { background-color: #f48fb1; color: #121212; border: none; padding: 10px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+    
+    /* كارت الفاتورة داخل الشات */
+    .bill-card { background-color: #1e1e1e; border: 1px solid #f48fb1; border-radius: 16px; padding: 14px; margin: 6px 0; width: 100%; max-width: 280px; align-self: flex-end; }
+    .bill-title { color: #f48fb1; font-weight: bold; margin-bottom: 10px; font-size: 14px; text-align: center; }
+    .input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+    .input-group input { padding: 8px; border-radius: 8px; border: 1px solid #333; background: #121212; color: #fff; text-align: center; font-size: 13px; }
+    .bill-btn { background-color: #f48fb1; color: #121212; border: none; padding: 8px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; font-size: 13px; }
+    .bill-result { margin-top: 8px; font-weight: bold; text-align: center; color: #f48fb1; font-size: 13px; }
+    
+    .input-area { background-color: #1e1e1e; padding: 10px; display: flex; gap: 6px; border-top: 1px solid #222; align-items: center; }
+    .input-area input { flex: 1; padding: 10px 14px; border-radius: 20px; border: 1px solid #333; background: #121212; color: white; outline: none; font-size: 14px; }
+    .send-btn, .mic-btn, .tool-btn { background-color: #f48fb1; color: #121212; border: none; padding: 8px 12px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+    .tool-btn { background-color: #262626; color: #f48fb1; border: 1px solid #f48fb1; }
     .recording { background-color: #ff5252 !important; color: white !important; animation: pulse 1s infinite; }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
     .modal-content { background: #1e1e1e; padding: 24px; border-radius: 16px; border: 1px solid #f48fb1; text-align: center; max-width: 300px; width: 90%; }
-    .modal-content h3 { color: #f48fb1; margin-bottom: 16px; }
+    .modal-content h3 { color: #f48fb1; margin-bottom: 16px; font-size: 16px; }
     #qrcode { display: flex; justify-content: center; margin: 16px 0; padding: 10px; background: #fff; border-radius: 8px; }
-    .close-btn { background: #f48fb1; color: #121212; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+    .close-btn { background: #f48fb1; color: #121212; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     audio { max-width: 100%; margin-top: 4px; }
   </style>
 </head>
@@ -48,28 +52,22 @@
   <div class="chat-container" id="chat">
     <div class="message received">
       <span class="user-name">أحمد</span>
-      يا سارة، العشا النهاردة كان تحفة! الحساب كلفنا 750 جنيه كلنا. 🍕🍔
+      عامل إيه يا صاحبي؟ جاهز لخروجة بكرة ولا عندك مذاكرة؟ ☕
     </div>
 
     <div class="message sent">
-      <span class="user-name">سارة</span>
-      تمام جداً! احنا كنا 3 أفراد.. تعالي نقسمها بالحاسبة الذكية تحت دي 👇
+      <span class="user-name">أنت</span>
+      الحمد لله تمام! جاهز جداً، هننزل فين؟
     </div>
 
-    <div class="bill-card">
-      <div class="bill-title">
-        <span>💳 تقسيم الفاتورة الذكي</span>
-      </div>
-      <div class="input-group">
-        <input type="number" id="totalAmount" placeholder="المبلغ الإجمالي (ج.م)" value="750">
-        <input type="number" id="peopleCount" placeholder="عدد الأشخاص" value="3">
-      </div>
-      <button class="bill-btn" onclick="calculateBill()">احسب نصيب كل فرد</button>
-      <div class="bill-result" id="billResult"></div>
+    <div class="message received">
+      <span class="user-name">أحمد</span>
+      هنتقابل في المطعم اللي اتفقنا عليه، وافتكر تقسم الحساب علينا أول ما نخلص 😅
     </div>
   </div>
 
   <div class="input-area">
+    <button class="tool-btn" onclick="sendBillCard()" title="إضافة فاتورة">💳</button>
     <button class="mic-btn" id="micBtn" onclick="toggleRecord()">🎤</button>
     <input type="text" id="messageInput" placeholder="اكتب رسالة...">
     <button class="send-btn" onclick="sendMessage()">إرسال</button>
@@ -88,19 +86,6 @@
     let mediaRecorder;
     let audioChunks = [];
     let isRecording = false;
-
-    window.onload = function() {
-      const savedMessages = JSON.parse(localStorage.getItem('talkie_messages')) || [];
-      const chat = document.getElementById('chat');
-      savedMessages.forEach(msg => {
-        if(msg.isAudio) {
-          appendAudioElement(msg.src, msg.type);
-        } else {
-          appendMessageElement(msg.text, msg.type, msg.sender);
-        }
-      });
-      chat.scrollTop = chat.scrollHeight;
-    };
 
     function showQR() {
       document.getElementById('qrModal').style.display = 'flex';
@@ -153,19 +138,56 @@
       const text = input.value.trim();
       if (text !== '') {
         appendMessageElement(text, 'sent', 'أنت');
-        saveMessage({ text: text, type: 'sent', sender: 'أنت', isAudio: false });
         input.value = '';
 
+        // رد آلي طبيعي من أحمد
         setTimeout(() => {
-          let botReply = "تمام استلمت رسالتك! 🤖";
-          if (text.includes("سلام") || text.includes("مرحبا") || text.includes("اهلا")) {
-            botReply = "أهلاً بيك! نورت الشات ✨";
-          } else if (text.includes("حساب") || text.includes("فاتورة") || text.includes("فلوس")) {
-            botReply = "تقدر تحسب وتقسم الحساب بسهولة من كارت الحسابات فوق 💳!";
+          let botReply = "تمام يا بوب، ظبط الكلام ونتقابل 👍";
+          if (text.includes("سلام") || text.includes("مرحبا") || text.includes("ازيك")) {
+            botReply = "حبيبي يا غالي، نورت الشات ✨";
+          } else if (text.includes("كام") || text.includes("حساب") || text.includes("فلوس")) {
+            botReply = "دوس على زرار الفاتورة 💳 تحت واحسب نصيب كل واحد كام!";
           }
           appendMessageElement(botReply, 'received', 'أحمد');
-          saveMessage({ text: botReply, type: 'received', sender: 'أحمد', isAudio: false });
         }, 1000);
+      }
+    }
+
+    // إرسال كارت الفاتورة الذكية داخل المحادثة عند الضغط على زرار 💳
+    function sendBillCard() {
+      const chat = document.getElementById('chat');
+      const cardId = 'bill_' + Date.now();
+      
+      const billHTML = `
+        <div class="bill-card">
+          <div class="bill-title">💳 تقسيم الفاتورة الذكي</div>
+          <div class="input-group">
+            <input type="number" id="amount_${cardId}" placeholder="المبلغ الإجمالي (ج.م)">
+            <input type="number" id="people_${cardId}" placeholder="عدد الأشخاص">
+          </div>
+          <button class="bill-btn" onclick="calculateDynamicBill('${cardId}')">احسب نصيب كل فرد</button>
+          <div class="bill-result" id="result_${cardId}"></div>
+        </div>
+      `;
+      
+      chat.insertAdjacentHTML('beforeend', billHTML);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function calculateDynamicBill(cardId) {
+      const total = parseFloat(document.getElementById(`amount_${cardId}`).value);
+      const count = parseInt(document.getElementById(`people_${cardId}`).value);
+      const resultDiv = document.getElementById(`result_${cardId}`);
+
+      if (total && count && count > 0) {
+        const perPerson = (total / count).toFixed(2);
+        resultDiv.textContent = `نصيب الفرد: ${perPerson} ج.م`;
+
+        setTimeout(() => {
+          appendMessageElement(`تمام يا سيدي، كدة كل واحد يدفع ${perPerson} جنيه 👌`, 'received', 'أحمد');
+        }, 800);
+      } else {
+        resultDiv.textContent = 'أدخل أرقاماً صحيحة';
       }
     }
 
@@ -181,7 +203,6 @@
             const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
             const audioUrl = URL.createObjectURL(audioBlob);
             appendAudioElement(audioUrl, 'sent');
-            saveMessage({ src: audioUrl, type: 'sent', isAudio: true });
           };
           mediaRecorder.start();
           isRecording = true;
@@ -197,31 +218,8 @@
         micBtn.textContent = '🎤';
       }
     }
-
-    function saveMessage(msgObj) {
-      const savedMessages = JSON.parse(localStorage.getItem('talkie_messages')) || [];
-      savedMessages.push(msgObj);
-      localStorage.setItem('talkie_messages', JSON.stringify(savedMessages));
-    }
-
-    function calculateBill() {
-      const total = parseFloat(document.getElementById('totalAmount').value);
-      const count = parseInt(document.getElementById('peopleCount').value);
-      const resultDiv = document.getElementById('billResult');
-
-      if (total && count && count > 0) {
-        const perPerson = (total / count).toFixed(2);
-        resultDiv.textContent = `نصيب الفرد: ${perPerson} ج.م`;
-
-        // إرسال رد آلي من أحمد بعد الحساب
-        setTimeout(() => {
-          appendMessageElement(`تمام كده، نصيب كل واحد فينا ${perPerson} ج.م 👍`, 'received', 'أحمد');
-        }, 800);
-      } else {
-        resultDiv.textContent = 'برجاء أدخل أرقام صحيحة';
-      }
-    }
   </script>
 
 </body>
 </html>
+
