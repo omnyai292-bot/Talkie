@@ -1,0 +1,21 @@
+{
+  "short_name": "Talkie",
+  "name": "Talkie Web App",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192/f48fb1/121212?text=Talkie",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://via.placeholder.com/512/f48fb1/121212?text=Talkie",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "display": "standalone"
+}
+
