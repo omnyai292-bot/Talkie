@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#121212">
   <title>Talkie</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -11,76 +10,60 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background-color: #121212; color: #ffffff; display: flex; flex-direction: column; height: 100vh; }
     
-    /* الهيدر */
+    /* الهيدر العلوي */
     .header { background-color: #1a1a1a; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2a2a; }
-    .header h1 { color: #f48fb1; font-size: 22px; font-weight: 700; letter-spacing: 0.5px; }
-    .qr-btn { background-color: #262626; color: #f48fb1; border: 1px solid #f48fb1; padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 600; transition: 0.2s; }
-    .qr-btn:active { transform: scale(0.95); }
+    .header h1 { color: #f48fb1; font-size: 22px; font-weight: 700; }
+    .qr-btn { background-color: #262626; color: #f48fb1; border: 1px solid #f48fb1; padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 600; }
 
-    /* منطقة المحادثة */
+    /* حاوية المحادثة */
     .chat-container { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-    .message { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 14px; word-wrap: break-word; line-height: 1.5; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-    .received { background-color: #222222; align-self: flex-start; border-bottom-right-radius: 4px; color: #f1f1f1; border: 1px solid #333; }
+    .message { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
+    .received { background-color: #222222; align-self: flex-start; border-bottom-right-radius: 4px; border: 1px solid #333; color: #fff; }
     .sent { background-color: #f48fb1; color: #121212; align-self: flex-end; border-bottom-left-radius: 4px; font-weight: 600; }
     .user-name { font-size: 11px; font-weight: 700; margin-bottom: 4px; display: block; opacity: 0.8; }
-    
-    /* زر فتح الفاتورة الشيك داخل المحادثة */
-    .feature-trigger-btn {
-      background: #000000;
-      border: 1px solid #f48fb1;
-      color: #f48fb1;
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-weight: bold;
-      font-size: 13px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 8px;
-      transition: all 0.2s;
-    }
-    .feature-trigger-btn:active { background: #f48fb1; color: #000000; }
 
-    /* كارت الفاتورة باللون الأسود الفاخر */
+    /* استعراض الميديا (صور وفيديوهات وصوت) */
+    .media-preview { max-width: 100%; border-radius: 12px; margin-top: 6px; display: block; }
+    audio { max-width: 100%; margin-top: 6px; }
+
+    /* بطاقة الفاتورة السوداء الفاخرة بالأسفل */
+    .bill-card-container { display: none; padding: 12px; background: #121212; border-top: 1px solid #222; justify-content: center; }
     .bill-card { 
       background-color: #0d0d0d; 
       border: 1px solid #f48fb1; 
-      border-radius: 20px; 
+      border-radius: 18px; 
       padding: 16px; 
-      margin: 8px 0; 
       width: 100%; 
-      max-width: 290px; 
-      align-self: center; 
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-      animation: fadeIn 0.3s ease-in-out;
+      max-width: 340px; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      animation: slideUp 0.3s ease;
     }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    
-    .bill-title { color: #f48fb1; font-weight: 700; margin-bottom: 12px; font-size: 15px; text-align: center; }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .bill-title { color: #f48fb1; font-weight: 700; margin-bottom: 12px; font-size: 15px; text-align: center; display: flex; justify-content: space-between; align-items: center; }
+    .close-card-btn { background: none; border: none; color: #888; font-size: 16px; cursor: pointer; }
     .input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
-    .input-group input { padding: 10px; border-radius: 10px; border: 1px solid #2c2c2c; background: #1a1a1a; color: #fff; text-align: center; font-size: 14px; outline: none; }
+    .input-group input { padding: 10px; border-radius: 10px; border: 1px solid #333; background: #1a1a1a; color: #fff; text-align: center; font-size: 14px; outline: none; }
     .input-group input:focus { border-color: #f48fb1; }
-    .bill-btn { background-color: #f48fb1; color: #121212; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 14px; transition: 0.2s; }
-    .bill-btn:active { opacity: 0.9; }
+    .bill-btn { background-color: #f48fb1; color: #121212; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 14px; }
     .bill-result { margin-top: 10px; font-weight: 700; text-align: center; color: #f48fb1; font-size: 14px; }
+
+    /* منطقة الإدخال والشريط السفلي */
+    .input-area { background-color: #1a1a1a; padding: 10px 12px; display: flex; gap: 6px; border-top: 1px solid #2a2a2a; align-items: center; }
+    .input-area input[type="text"] { flex: 1; padding: 10px 14px; border-radius: 24px; border: 1px solid #2c2c2c; background: #121212; color: white; outline: none; font-size: 14px; }
     
-    /* شريط الكتابة والأزرار */
-    .input-area { background-color: #1a1a1a; padding: 10px 12px; display: flex; gap: 8px; border-top: 1px solid #2a2a2a; align-items: center; }
-    .input-area input { flex: 1; padding: 10px 16px; border-radius: 24px; border: 1px solid #2c2c2c; background: #121212; color: white; outline: none; font-size: 14px; }
-    .input-area input:focus { border-color: #f48fb1; }
-    .send-btn, .mic-btn, .tool-btn { background-color: #f48fb1; color: #121212; border: none; padding: 10px 14px; border-radius: 24px; font-weight: bold; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-    .tool-btn { background-color: #262626; color: #f48fb1; border: 1px solid #f48fb1; }
+    .action-btn { background-color: #262626; color: #f48fb1; border: 1px solid #f48fb1; padding: 8px 11px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+    .send-btn { background-color: #f48fb1; color: #121212; border: none; padding: 10px 16px; border-radius: 24px; font-weight: bold; cursor: pointer; font-size: 14px; }
+    .mic-btn { background-color: #f48fb1; color: #121212; border: none; padding: 9px; border-radius: 50%; cursor: pointer; font-size: 14px; }
     .recording { background-color: #ff5252 !important; color: white !important; animation: pulse 1s infinite; }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-    
-    /* النافذة المنبثقة للـ QR */
+
+    /* النافذة المنبثقة لـ QR */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; }
     .modal-content { background: #1a1a1a; padding: 24px; border-radius: 20px; border: 1px solid #f48fb1; text-align: center; max-width: 300px; width: 90%; }
     .modal-content h3 { color: #f48fb1; margin-bottom: 16px; font-size: 16px; }
     #qrcode { display: flex; justify-content: center; margin: 16px 0; padding: 12px; background: #fff; border-radius: 12px; }
     .close-btn { background: #f48fb1; color: #121212; border: none; padding: 8px 18px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-    audio { max-width: 100%; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -90,6 +73,7 @@
     <button class="qr-btn" onclick="showQR()">رمز QR</button>
   </div>
 
+  <!-- منطقة الرسائل -->
   <div class="chat-container" id="chat">
     <div class="message received">
       <span class="user-name">أحمد</span>
@@ -103,21 +87,43 @@
 
     <div class="message received">
       <span class="user-name">أحمد</span>
-      هنتقابل في المطعم، ولما نخلص الحساب استخدم أداة الفاتورة 💳 عشان نقسمه بيننا!
-      <br>
-      <button class="feature-trigger-btn" id="triggerBtn" onclick="openBillCard()">
-        💳 فتح تقسيم الفاتورة
-      </button>
+      هنتقابل في المطعم، ولما نخلص الحساب استخدم أداة الفاتورة 💳 من تحت عشان تقسمه بيننا!
     </div>
   </div>
 
+  <!-- لوحة بطاقة الفاتورة السوداء (تفتح عند الحاجة فقط) -->
+  <div class="bill-card-container" id="billCardContainer">
+    <div class="bill-card">
+      <div class="bill-title">
+        <span>💳 تقسيم الفاتورة الذكي</span>
+        <button class="close-card-btn" onclick="toggleBillCard()">✕</button>
+      </div>
+      <div class="input-group">
+        <input type="number" id="amount" placeholder="المبلغ الإجمالي (ج.م)" value="750">
+        <input type="number" id="people" placeholder="عدد الأشخاص" value="3">
+      </div>
+      <button class="bill-btn" onclick="calculateBill()">احسب نصيب كل فرد</button>
+      <div class="bill-result" id="result"></div>
+    </div>
+  </div>
+
+  <!-- شريط الكتابة والملحقات السفلي -->
   <div class="input-area">
-    <button class="tool-btn" onclick="sendBillCard()" title="إضافة فاتورة">💳</button>
-    <button class="mic-btn" id="micBtn" onclick="toggleRecord()">🎤</button>
+    <!-- زر إرفاق الميديا (صور وفيديوهات) -->
+    <button class="action-btn" onclick="document.getElementById('fileInput').click()" title="إرسال صورة أو فيديو">📁</button>
+    <input type="file" id="fileInput" accept="image/*,video/*" style="display: none;" onchange="handleFileUpload(event)">
+    
+    <!-- زر أداة الفاتورة السوداء -->
+    <button class="action-btn" onclick="toggleBillCard()" title="تقسيم الفاتورة">💳</button>
+    
+    <!-- زر التسجيل الصوتي -->
+    <button class="mic-btn" id="micBtn" onclick="toggleRecord()" title="تسجيل صوتي">🎤</button>
+    
     <input type="text" id="messageInput" placeholder="اكتب رسالة...">
     <button class="send-btn" onclick="sendMessage()">إرسال</button>
   </div>
 
+  <!-- النافذة المنبثقة لرمز QR -->
   <div class="modal" id="qrModal">
     <div class="modal-content">
       <h3>امسح الكود لفتح التطبيق 📱</h3>
@@ -127,8 +133,6 @@
   </div>
 
   <script>
-    localStorage.removeItem('talkie_messages');
-
     let qrGenerated = false;
     let mediaRecorder;
     let audioChunks = [];
@@ -137,91 +141,35 @@
     function showQR() {
       document.getElementById('qrModal').style.display = 'flex';
       if (!qrGenerated) {
-        new QRCode(document.getElementById("qrcode"), {
-          text: window.location.href,
-          width: 180,
-          height: 180,
-          colorDark : "#121212",
-          colorLight : "#ffffff"
-        });
+        new QRCode(document.getElementById("qrcode"), { text: window.location.href, width: 180, height: 180 });
         qrGenerated = true;
       }
     }
 
-    function hideQR() {
-      document.getElementById('qrModal').style.display = 'none';
-    }
+    function hideQR() { document.getElementById('qrModal').style.display = 'none'; }
 
-    function appendMessageElement(text, type, sender) {
-      const chat = document.getElementById('chat');
-      const msgDiv = document.createElement('div');
-      msgDiv.className = `message ${type}`;
-      if (sender) {
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'user-name';
-        nameSpan.textContent = sender;
-        msgDiv.appendChild(nameSpan);
+    // إظهار وإخفاء بطاقة الفاتورة السوداء بالأسفل
+    function toggleBillCard() {
+      const container = document.getElementById('billCardContainer');
+      if (container.style.display === 'flex') {
+        container.style.display = 'none';
+      } else {
+        container.style.display = 'flex';
       }
-      const textNode = document.createTextNode(text);
-      msgDiv.appendChild(textNode);
-      chat.appendChild(msgDiv);
-      chat.scrollTop = chat.scrollHeight;
     }
 
-    function appendAudioElement(src, type) {
-      const chat = document.getElementById('chat');
-      const msgDiv = document.createElement('div');
-      msgDiv.className = `message ${type}`;
-      const audio = document.createElement('audio');
-      audio.controls = true;
-      audio.src = src;
-      msgDiv.appendChild(audio);
-      chat.appendChild(msgDiv);
-      chat.scrollTop = chat.scrollHeight;
-    }
-
-    function openBillCard() {
-      const triggerBtn = document.getElementById('triggerBtn');
-      if (triggerBtn) {
-        triggerBtn.disabled = true;
-        triggerBtn.style.opacity = '0.5';
-        triggerBtn.textContent = '✔️ تم فتح البطاقة';
-      }
-      sendBillCard(750, 3);
-    }
-
-    function sendBillCard(defaultAmount = '', defaultPeople = '') {
-      const chat = document.getElementById('chat');
-      const cardId = 'bill_' + Date.now();
-      
-      const billHTML = `
-        <div class="bill-card">
-          <div class="bill-title">💳 تقسيم الفاتورة الذكي</div>
-          <div class="input-group">
-            <input type="number" id="amount_${cardId}" placeholder="المبلغ الإجمالي (ج.م)" value="${defaultAmount}">
-            <input type="number" id="people_${cardId}" placeholder="عدد الأشخاص" value="${defaultPeople}">
-          </div>
-          <button class="bill-btn" onclick="calculateDynamicBill('${cardId}')">احسب نصيب كل فرد</button>
-          <div class="bill-result" id="result_${cardId}"></div>
-        </div>
-      `;
-      
-      chat.insertAdjacentHTML('beforeend', billHTML);
-      chat.scrollTop = chat.scrollHeight;
-    }
-
-    function calculateDynamicBill(cardId) {
-      const total = parseFloat(document.getElementById(`amount_${cardId}`).value);
-      const count = parseInt(document.getElementById(`people_${cardId}`).value);
-      const resultDiv = document.getElementById(`result_${cardId}`);
+    function calculateBill() {
+      const total = parseFloat(document.getElementById('amount').value);
+      const count = parseInt(document.getElementById('people').value);
+      const resultDiv = document.getElementById('result');
 
       if (total && count && count > 0) {
         const perPerson = (total / count).toFixed(2);
         resultDiv.textContent = `نصيب الفرد: ${perPerson} ج.م`;
-
+        
         setTimeout(() => {
-          appendMessageElement(`تمام كده، نصيب كل واحد فينا ${perPerson} ج.م 👍`, 'received', 'أحمد');
-        }, 800);
+          appendMessage(`تم حساب الفاتورة: نصيب كل فرد ${perPerson} ج.م 👍`, 'sent', 'أنت');
+        }, 500);
       } else {
         resultDiv.textContent = 'أدخل أرقاماً صحيحة';
       }
@@ -231,21 +179,50 @@
       const input = document.getElementById('messageInput');
       const text = input.value.trim();
       if (text !== '') {
-        appendMessageElement(text, 'sent', 'أنت');
+        appendMessage(text, 'sent', 'أنت');
         input.value = '';
 
         setTimeout(() => {
-          let botReply = "تمام يا بوب، ظبط الكلام ونتقابل 👍";
-          if (text.includes("سلام") || text.includes("مرحبا") || text.includes("ازيك")) {
-            botReply = "حبيبي يا غالي، نورت الشات ✨";
-          } else if (text.includes("كام") || text.includes("حساب") || text.includes("فلوس")) {
-            botReply = "دوس على زرار الفاتورة 💳 تحت واحسب نصيب كل واحد كام!";
-          }
-          appendMessageElement(botReply, 'received', 'أحمد');
+          appendMessage("تمام يا بوب، ظبط الكلام ونتقابل 👍", 'received', 'أحمد');
         }, 1000);
       }
     }
 
+    function appendMessage(text, type, sender) {
+      const chat = document.getElementById('chat');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${type}`;
+      if (sender) {
+        msgDiv.innerHTML = `<span class="user-name">${sender}</span>` + text;
+      } else {
+        msgDiv.textContent = text;
+      }
+      chat.appendChild(msgDiv);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    // التعامل مع رفع الصور والفيديوهات
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const chat = document.getElementById('chat');
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message sent';
+        msgDiv.innerHTML = `<span class="user-name">أنت</span>`;
+
+        const fileUrl = URL.createObjectURL(file);
+        if (file.type.startsWith('image/')) {
+          msgDiv.innerHTML += `<img src="${fileUrl}" class="media-preview">`;
+        } else if (file.type.startsWith('video/')) {
+          msgDiv.innerHTML += `<video src="${fileUrl}" controls class="media-preview"></video>`;
+        }
+
+        chat.appendChild(msgDiv);
+        chat.scrollTop = chat.scrollHeight;
+      }
+    }
+
+    // التسجيل الصوتي
     async function toggleRecord() {
       const micBtn = document.getElementById('micBtn');
       if (!isRecording) {
@@ -257,14 +234,20 @@
           mediaRecorder.onstop = () => {
             const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
             const audioUrl = URL.createObjectURL(audioBlob);
-            appendAudioElement(audioUrl, 'sent');
+            
+            const chat = document.getElementById('chat');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message sent';
+            msgDiv.innerHTML = `<span class="user-name">أنت</span><audio controls src="${audioUrl}"></audio>`;
+            chat.appendChild(msgDiv);
+            chat.scrollTop = chat.scrollHeight;
           };
           mediaRecorder.start();
           isRecording = true;
           micBtn.classList.add('recording');
           micBtn.textContent = '⏹️';
         } catch (err) {
-          alert('برجاء السماح بصلاحية المايكروفون للتسجيل!');
+          alert('برجاء السماح بالمايكروفون للتسجيل!');
         }
       } else {
         mediaRecorder.stop();
@@ -276,5 +259,4 @@
   </script>
 
 </body>
-      </html>
-      
+</html>
