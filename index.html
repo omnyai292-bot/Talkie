@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#121212">
   <title>Talkie</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
@@ -54,7 +56,6 @@
   </div>
 
   <script>
-    // تحميل الرسائل المحفوظة عند فتح الصفحة
     window.onload = function() {
       const savedMessages = JSON.parse(localStorage.getItem('talkie_messages')) || [];
       const chat = document.getElementById('chat');
@@ -77,7 +78,6 @@
         msgDiv.textContent = text;
         chat.appendChild(msgDiv);
 
-        // حفظ الرسالة في ذاكرة المتصفح
         const savedMessages = JSON.parse(localStorage.getItem('talkie_messages')) || [];
         savedMessages.push(text);
         localStorage.setItem('talkie_messages', JSON.stringify(savedMessages));
