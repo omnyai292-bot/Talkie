@@ -6,7 +6,6 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#121212">
   <title>Talkie</title>
-  <!-- مكتبة توليد QR Code -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
@@ -18,22 +17,25 @@
     .message { max-width: 80%; padding: 12px 16px; border-radius: 16px; font-size: 15px; word-wrap: break-word; }
     .received { background-color: #262626; align-self: flex-start; border-bottom-right-radius: 4px; color: #fff; }
     .sent { background-color: #f48fb1; color: #121212; align-self: flex-end; border-bottom-left-radius: 4px; font-weight: 500; }
+    .user-name { font-size: 11px; font-weight: bold; margin-bottom: 4px; display: block; opacity: 0.8; }
     .bill-card { background-color: #1e1e1e; border: 1px solid #f48fb1; border-radius: 16px; padding: 16px; margin: 8px 0; width: 100%; max-width: 320px; align-self: center; }
     .bill-title { color: #f48fb1; font-weight: bold; margin-bottom: 12px; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
     .input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
     .input-group input { padding: 10px; border-radius: 8px; border: 1px solid #333; background: #121212; color: #fff; text-align: center; }
     .bill-btn { background-color: #f48fb1; color: #121212; border: none; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; }
     .bill-result { margin-top: 10px; font-weight: bold; text-align: center; color: #f48fb1; }
-    .input-area { background-color: #1e1e1e; padding: 12px; display: flex; gap: 8px; border-top: 1px solid #222; }
+    .input-area { background-color: #1e1e1e; padding: 12px; display: flex; gap: 8px; border-top: 1px solid #222; align-items: center; }
     .input-area input { flex: 1; padding: 12px; border-radius: 20px; border: 1px solid #333; background: #121212; color: white; outline: none; }
-    .send-btn { background-color: #f48fb1; color: #121212; border: none; padding: 0 16px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+    .send-btn, .mic-btn { background-color: #f48fb1; color: #121212; border: none; padding: 10px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+    .recording { background-color: #ff5252 !important; color: white !important; animation: pulse 1s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     
-    /* نافذة الـ QR Pop-up */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
     .modal-content { background: #1e1e1e; padding: 24px; border-radius: 16px; border: 1px solid #f48fb1; text-align: center; max-width: 300px; width: 90%; }
     .modal-content h3 { color: #f48fb1; margin-bottom: 16px; }
     #qrcode { display: flex; justify-content: center; margin: 16px 0; padding: 10px; background: #fff; border-radius: 8px; }
     .close-btn { background: #f48fb1; color: #121212; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+    audio { max-width: 100%; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -44,16 +46,23 @@
   </div>
 
   <div class="chat-container" id="chat">
-    <div class="message received">جاهزين للخروجة النهاردة؟ 🚀</div>
-    <div class="message sent">تمام جداً! يلا نقسم الحساب بعد العشا.</div>
+    <div class="message received">
+      <span class="user-name">أحمد</span>
+      يا سارة، العشا النهاردة كان تحفة! الحساب كلفنا 750 جنيه كلنا. 🍕🍔
+    </div>
+
+    <div class="message sent">
+      <span class="user-name">سارة</span>
+      تمام جداً! احنا كنا 3 أفراد.. تعالي نقسمها بالحاسبة الذكية تحت دي 👇
+    </div>
 
     <div class="bill-card">
       <div class="bill-title">
         <span>💳 تقسيم الفاتورة الذكي</span>
       </div>
       <div class="input-group">
-        <input type="number" id="totalAmount" placeholder="المبلغ الإجمالي (ج.م)">
-        <input type="number" id="peopleCount" placeholder="عدد الأشخاص">
+        <input type="number" id="totalAmount" placeholder="المبلغ الإجمالي (ج.م)" value="750">
+        <input type="number" id="peopleCount" placeholder="عدد الأشخاص" value="3">
       </div>
       <button class="bill-btn" onclick="calculateBill()">احسب نصيب كل فرد</button>
       <div class="bill-result" id="billResult"></div>
@@ -61,11 +70,11 @@
   </div>
 
   <div class="input-area">
+    <button class="mic-btn" id="micBtn" onclick="toggleRecord()">🎤</button>
     <input type="text" id="messageInput" placeholder="اكتب رسالة...">
     <button class="send-btn" onclick="sendMessage()">إرسال</button>
   </div>
 
-  <!-- النافذة المنبثقة لرمز الـ QR -->
   <div class="modal" id="qrModal">
     <div class="modal-content">
       <h3>امسح الكود لفتح التطبيق 📱</h3>
@@ -76,15 +85,19 @@
 
   <script>
     let qrGenerated = false;
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
 
     window.onload = function() {
       const savedMessages = JSON.parse(localStorage.getItem('talkie_messages')) || [];
       const chat = document.getElementById('chat');
       savedMessages.forEach(msg => {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `message ${msg.type}`;
-        msgDiv.textContent = msg.text;
-        chat.appendChild(msgDiv);
+        if(msg.isAudio) {
+          appendAudioElement(msg.src, msg.type);
+        } else {
+          appendMessageElement(msg.text, msg.type, msg.sender);
+        }
       });
       chat.scrollTop = chat.scrollHeight;
     };
@@ -107,36 +120,88 @@
       document.getElementById('qrModal').style.display = 'none';
     }
 
-    function appendAndSaveMessage(text, type) {
+    function appendMessageElement(text, type, sender) {
       const chat = document.getElementById('chat');
       const msgDiv = document.createElement('div');
       msgDiv.className = `message ${type}`;
-      msgDiv.textContent = text;
+      if (sender) {
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'user-name';
+        nameSpan.textContent = sender;
+        msgDiv.appendChild(nameSpan);
+      }
+      const textNode = document.createTextNode(text);
+      msgDiv.appendChild(textNode);
       chat.appendChild(msgDiv);
       chat.scrollTop = chat.scrollHeight;
+    }
 
-      const savedMessages = JSON.parse(localStorage.getItem('talkie_messages')) || [];
-      savedMessages.push({ text: text, type: type });
-      localStorage.setItem('talkie_messages', JSON.stringify(savedMessages));
+    function appendAudioElement(src, type) {
+      const chat = document.getElementById('chat');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${type}`;
+      const audio = document.createElement('audio');
+      audio.controls = true;
+      audio.src = src;
+      msgDiv.appendChild(audio);
+      chat.appendChild(msgDiv);
+      chat.scrollTop = chat.scrollHeight;
     }
 
     function sendMessage() {
       const input = document.getElementById('messageInput');
       const text = input.value.trim();
       if (text !== '') {
-        appendAndSaveMessage(text, 'sent');
+        appendMessageElement(text, 'sent', 'أنت');
+        saveMessage({ text: text, type: 'sent', sender: 'أنت', isAudio: false });
         input.value = '';
 
         setTimeout(() => {
-          let botReply = "تم استلام رسالتك بنجاح! 🤖";
+          let botReply = "تمام استلمت رسالتك! 🤖";
           if (text.includes("سلام") || text.includes("مرحبا") || text.includes("اهلا")) {
-            botReply = "أهلاً بك في تطبيق Talkie! كيف يمكنني مساعدتك اليوم؟ ✨";
+            botReply = "أهلاً بيك! نورت الشات ✨";
           } else if (text.includes("حساب") || text.includes("فاتورة") || text.includes("فلوس")) {
-            botReply = "تقدر تحسب الفاتورة وتقسم الحساب بسهولة من كارت الحسابات فوق 💳!";
+            botReply = "تقدر تحسب وتقسم الحساب بسهولة من كارت الحسابات فوق 💳!";
           }
-          appendAndSaveMessage(botReply, 'received');
+          appendMessageElement(botReply, 'received', 'أحمد');
+          saveMessage({ text: botReply, type: 'received', sender: 'أحمد', isAudio: false });
         }, 1000);
       }
+    }
+
+    async function toggleRecord() {
+      const micBtn = document.getElementById('micBtn');
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+          mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            appendAudioElement(audioUrl, 'sent');
+            saveMessage({ src: audioUrl, type: 'sent', isAudio: true });
+          };
+          mediaRecorder.start();
+          isRecording = true;
+          micBtn.classList.add('recording');
+          micBtn.textContent = '⏹️';
+        } catch (err) {
+          alert('برجاء السماح بصلاحية المايكروفون للتسجيل!');
+        }
+      } else {
+        mediaRecorder.stop();
+        isRecording = false;
+        micBtn.classList.remove('recording');
+        micBtn.textContent = '🎤';
+      }
+    }
+
+    function saveMessage(msgObj) {
+      const savedMessages = JSON.parse(localStorage.getItem('talkie_messages')) || [];
+      savedMessages.push(msgObj);
+      localStorage.setItem('talkie_messages', JSON.stringify(savedMessages));
     }
 
     function calculateBill() {
@@ -147,6 +212,11 @@
       if (total && count && count > 0) {
         const perPerson = (total / count).toFixed(2);
         resultDiv.textContent = `نصيب الفرد: ${perPerson} ج.م`;
+
+        // إرسال رد آلي من أحمد بعد الحساب
+        setTimeout(() => {
+          appendMessageElement(`تمام كده، نصيب كل واحد فينا ${perPerson} ج.م 👍`, 'received', 'أحمد');
+        }, 800);
       } else {
         resultDiv.textContent = 'برجاء أدخل أرقام صحيحة';
       }
