@@ -62,7 +62,7 @@
 
     <div class="message received">
       <span class="user-name">أحمد</span>
-      هنتقابل في المطعم اللي اتفقنا عليه، وافتكر تقسم الحساب علينا أول ما نخلص 😅
+      هنتقابل في المطعم، ولما نخلص الحساب هنستخدم أداة الفاتورة 💳 تقسمه بيننا!
     </div>
   </div>
 
@@ -82,6 +82,9 @@
   </div>
 
   <script>
+    // تنظيف أي رسائل قديمة مخزنة تجنباً لظهور الشات القديم
+    localStorage.removeItem('talkie_messages');
+
     let qrGenerated = false;
     let mediaRecorder;
     let audioChunks = [];
@@ -140,7 +143,6 @@
         appendMessageElement(text, 'sent', 'أنت');
         input.value = '';
 
-        // رد آلي طبيعي من أحمد
         setTimeout(() => {
           let botReply = "تمام يا بوب، ظبط الكلام ونتقابل 👍";
           if (text.includes("سلام") || text.includes("مرحبا") || text.includes("ازيك")) {
@@ -153,7 +155,6 @@
       }
     }
 
-    // إرسال كارت الفاتورة الذكية داخل المحادثة عند الضغط على زرار 💳
     function sendBillCard() {
       const chat = document.getElementById('chat');
       const cardId = 'bill_' + Date.now();
