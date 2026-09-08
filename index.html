@@ -35,7 +35,6 @@
     <div class="message received">جاهزين للخروجة النهاردة؟ 🚀</div>
     <div class="message sent">تمام جداً! يلا نقسم الحساب بعد العشا.</div>
 
-    <!-- حاسبة الفاتورة التفاعلية -->
     <div class="bill-card">
       <div class="bill-title">
         <span>💳 تقسيم الفاتورة الذكي</span>
@@ -49,13 +48,25 @@
     </div>
   </div>
 
-  <!-- منطقة كتابة الرسائل -->
   <div class="input-area">
     <input type="text" id="messageInput" placeholder="اكتب رسالة...">
     <button class="send-btn" onclick="sendMessage()">إرسال</button>
   </div>
 
   <script>
+    // تحميل الرسائل المحفوظة عند فتح الصفحة
+    window.onload = function() {
+      const savedMessages = JSON.parse(localStorage.getItem('talkie_messages')) || [];
+      const chat = document.getElementById('chat');
+      savedMessages.forEach(text => {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message sent';
+        msgDiv.textContent = text;
+        chat.appendChild(msgDiv);
+      });
+      chat.scrollTop = chat.scrollHeight;
+    };
+
     function sendMessage() {
       const input = document.getElementById('messageInput');
       const text = input.value.trim();
@@ -65,6 +76,12 @@
         msgDiv.className = 'message sent';
         msgDiv.textContent = text;
         chat.appendChild(msgDiv);
+
+        // حفظ الرسالة في ذاكرة المتصفح
+        const savedMessages = JSON.parse(localStorage.getItem('talkie_messages')) || [];
+        savedMessages.push(text);
+        localStorage.setItem('talkie_messages', JSON.stringify(savedMessages));
+
         input.value = '';
         chat.scrollTop = chat.scrollHeight;
       }
@@ -85,5 +102,4 @@
   </script>
 
 </body>
-    </html>
-    
+</html>
